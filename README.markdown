@@ -1,5 +1,5 @@
-Python's difflib for Ruby
-=========================
+Python's difflib.get_close_matches for Ruby
+===========================================
 
 Based on [this](http://rails-engines.rubyforge.org/rdoc/wiki_engine/classes/Diff/Utilities.html)
 port of python's difflib. The port had 'XXX untested' for the get _ close _ matches function.
