@@ -173,18 +173,9 @@ module Diff
       avail   = {}
       matches = 0
       @a.each do |elt|
-        if avail.has_key?(elt)
-            numb = avail[elt]
-        else
-            numb = (@fullbcount[elt] || 0)
-        end
+        numb       = avail.has_key?(elt) ? avail[elt] : (@fullbcount[elt] || 0)
         avail[elt] = numb - 1
-        if numb > 0
-            matches = matches + 1
-        end
-        #numb       = avail.has_key?(elt) ? avail[elt] : (@fullbcount[elt] || 0)
-        #avail[elt] = numb - 1
-        #matches   += 1 if numb > 0
+        matches   += 1 if numb > 0
       end
       Diff.calculate_ratio(matches, @a.size + @b.size)
     end
@@ -206,28 +197,26 @@ module Diff
     def get_close_matches(word, possibilities, n=3, cutoff=0.6)
       raise "n must be > 0: #{n}" unless n > 0
       raise "cutoff must be in (0.0..1.0): #{cutoff}" unless (cutoff >= 0.0) and (cutoff <= 1.0)
-      result = []
-      sequence_matcher = Diff::SequenceMatcher.new
-      sequence_matcher.set_sequence_b word
-      possibilities.each do |possibility|
-        sequence_matcher.set_sequence_a possibility
-        rqr = sequence_matcher.real_quick_ratio
-        qr =  sequence_matcher.quick_ratio 
-        r = sequence_matcher.ratio 
-        #print "#{possibility} #{rqr} #{qr} #{r}\n"
-        if (rqr >= cutoff) and (qr >= cutoff) and (r >= cutoff) then
-          result.push [r, possibility]
-        end
-      end
+      result = get_results(word, possibilities, cutoff)
       unless result.nil_or_empty?
         result.sort!
-        result = result[-n..-1]
+        if n < result.size then result = result[-n..-1] end
         result.reverse!
       end
       result.map! {|score, x| x }
     end
 
     def get_best_match(word, possibilities, cutoff=0.6)
+      raise "cutoff must be in (0.0..1.0): #{cutoff}" unless (cutoff >= 0.0) and (cutoff <= 1.0)
+      result = get_results(word, possibilities, cutoff)
+      unless result.nil_or_empty?
+          return result.max[1]
+      else
+          return nil
+      end
+    end
+
+    def get_results(word, possibilities, cutoff)
       result = []
       sequence_matcher = Diff::SequenceMatcher.new
       sequence_matcher.set_sequence_b word
@@ -241,14 +230,9 @@ module Diff
           result.push [r, possibility]
         end
       end
-      return result.max[1]
+      return result
     end
 
-    def count_leading(line, ch)
-      count, size = 0, line.size
-      count += 1 while count < size and line[count].chr == ch
-      count
-    end
   end
 end
 
