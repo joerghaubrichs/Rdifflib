@@ -11,12 +11,6 @@ Documentation
 
 The port code doesn't contain the detailed comments the python version has - maybe I should add them at some point.
 
-TODO
-----
-- Clean up code 
-- remove duplicate code
-- small unit test
-
 Example
 -------
 
